@@ -1,7 +1,9 @@
 {
   "name": "clock-mock",
-  "version": "0.0.0",
-  "files": ["index.js"],
+  "version": "1.0.0",
+  "files": [
+    "index.js"
+  ],
   "main": "index.js",
   "exports": {
     "./": "./index.js"
