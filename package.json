@@ -6,7 +6,7 @@
   ],
   "main": "index.js",
   "exports": {
-    "./": "./index.js"
+    ".": "./index.js"
   },
   "description": "a mock clock for tests involving timing",
   "repository": {
