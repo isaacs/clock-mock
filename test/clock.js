@@ -1,6 +1,8 @@
 const Clock = require('../')
 const t = require('tap')
 
+global.performance = global.performance || require('perf_hooks').performance
+
 const c = new Clock()
 t.equal(c.now(), 0, 'start at zero')
 

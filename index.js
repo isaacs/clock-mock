@@ -65,8 +65,9 @@ class Clock {
   }
 
   enter () {
+    /* istanbul ignore next - backwards comp affordance */
     const {
-      performance: { now },
+      performance: { now } = require('perf_hooks').performance,
       Date,
       setTimeout,
       setInterval,
@@ -112,11 +113,20 @@ class Clock {
       process: { hrtime },
     } = this._saved
     this._saved = null
-    Object.defineProperty(global.performance, 'now', {
-      value: now,
-      enumerable: true,
-      configurable: true,
-    })
+    /* istanbul ignore next - backwards comp affordance */
+    if (global.performance) {
+      Object.defineProperty(global.performance, 'now', {
+        value: now,
+        enumerable: true,
+        configurable: true,
+      })
+    } else {
+      Object.defineProperty(require('perf_hooks').performance, 'now', {
+        value: now,
+        enumerable: true,
+        configurable: true,
+      })
+    }
     global.process.hrtime = hrtime
     global.Date = Date
     global.setTimeout = setTimeout
