@@ -98,7 +98,7 @@ t.test('enter/exit', t => {
   t.not(performance.now(), c.now())
   const {setTimeout} = global
   t.teardown(c.enter())
-  t.equal(Date, c.Date)
+  t.type(new Date(), c.Date)
   t.not(setTimeout, global.setTimeout)
   t.same(process.hrtime(), c.hrtime())
   t.equal(process.hrtime.bigint(), c.hrtimeBigint())
@@ -106,6 +106,9 @@ t.test('enter/exit', t => {
   const timer = global.setTimeout(() => {})
   t.type(timer, Clock.Timer)
   clearTimeout(timer)
+
+  // enter again is no-op
+  c.enter()
 
   let intervalCalled = 0
   const interval = setInterval(() => intervalCalled ++, 10)
@@ -117,9 +120,36 @@ t.test('enter/exit', t => {
   c.advance(10)
   t.equal(intervalCalled, 2)
   t.equal(performance.now(), c.now())
+
+  // grabbing a ref before exit still puts it back how it was
+  const D = global.Date
+  const {now: perfNow} = performance
+  const {hrtime} = process
+  const {bigint: hrtimeBigint} = hrtime
+  const {
+    setTimeout: sT,
+    setInterval: sI,
+    clearTimeout: cT,
+    clearInterval: cI,
+  } = global
+
   c.exit()
+  t.type(new D(), global.Date)
+  t.not(perfNow(), c.now())
+  t.notSame(hrtime(), c.hrtime())
+  t.not(hrtimeBigint(), c.hrtimeBigint())
+
+  const timerSet = sT(() => {})
+  t.notMatch(timerSet, Clock.Timer)
+  cT(timerSet)
+
+  const intervalSet = sI(() => {})
+  t.notMatch(intervalSet, Clock.Timer)
+  cI(intervalSet)
+
   t.equal(global.setTimeout, setTimeout)
   t.not(performance.now(), c.now())
+
   c.exit()
   t.equal(global.setTimeout, setTimeout)
   t.not(performance.now(), c.now())

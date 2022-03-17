@@ -65,6 +65,10 @@ class Clock {
   }
 
   enter () {
+    if (this._saved) {
+      return
+    }
+
     /* istanbul ignore next - backwards comp affordance */
     const {
       performance: { now } = require('perf_hooks').performance,
@@ -75,7 +79,7 @@ class Clock {
       clearInterval,
       process: { hrtime },
     } = global
-    this._saved = {
+    const saved = this._saved = {
       performance: { now },
       Date,
       setTimeout,
@@ -84,18 +88,48 @@ class Clock {
       clearInterval,
       process: { hrtime },
     }
+
     Object.defineProperty(global.performance, 'now', {
-      value: () => this._now,
+      value: () => this._saved === saved ? this._now : saved.performance.now,
       enumerable: true,
       configurable: true,
     })
-    global.process.hrtime = (...a) => this.hrtime(...a)
-    global.process.hrtime.bigint = () => this.hrtimeBigint()
-    global.Date = this.Date
-    global.setTimeout = (...a) => this.setTimeout(...a)
-    global.setInterval = (...a) => this.setInterval(...a)
-    global.clearTimeout = (...a) => this.clearTimeout(...a)
-    global.clearInterval = (...a) => this.clearInterval(...a)
+
+    global.process.hrtime = (...a) =>
+      this._saved === saved ? this.hrtime(...a)
+        : saved.process.hrtime(...a)
+
+    global.process.hrtime.bigint = () =>
+      this._saved === saved ? this.hrtimeBigint()
+        : saved.process.hrtime.bigint()
+
+    const self = this
+    global.Date = class extends this.Date {
+      constructor (...args) {
+        if (self._saved) {
+          return new self.Date(...args)
+        } else {
+          return new saved.Date(...args)
+        }
+      }
+    }
+
+    global.setTimeout = (...a) =>
+      this._saved === saved ? this.setTimeout(...a)
+        : saved.setTimeout(...a)
+
+    global.setInterval = (...a) =>
+      this._saved === saved ? this.setInterval(...a)
+        : saved.setInterval(...a)
+
+    global.clearTimeout = (...a) =>
+      this._saved === saved ? this.clearTimeout(...a)
+        : saved.clearTimeout(...a)
+
+    global.clearInterval = (...a) =>
+      this._saved === saved ? this.clearInterval(...a)
+        : saved.clearInterval(...a)
+
     return () => this.exit()
   }
 
