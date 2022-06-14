@@ -2,7 +2,8 @@
   "name": "clock-mock",
   "version": "1.0.5",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "main": "index.js",
   "exports": {
