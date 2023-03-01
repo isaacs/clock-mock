@@ -2,17 +2,18 @@
 declare module 'clock-mock' {
   export default class Clock {
     _now: number
-    timers: { [k: number]: Node.Timer }
+    timers: { [k: number]: NodeJS.Timer }
     Date: MockDate
 
     now(): number
     travel(to: number): void
     advance(n: number): void
-    setTimeout(f: (..._: any[]) => any, n: number = 1): Timer
+    flow(n: number): Promise<void>
+    setTimeout(f: (..._: any[]) => any, n?: number): Timer
     clearTimeout(t: Timer): void
-    setInterval(f: (..._: any[]) => any, n: number = 1): Timer
+    setInterval(f: (..._: any[]) => any, n?: number): Timer
     clearInterval(t: Timer): void
-    hrtime(s = ([number, number] = [0, 0])): [number, number]
+    hrtime(s?:[number, number]): [number, number]
     hrtimeBigint(): BigInt
     enter(): ()=>void
     exit(): void

@@ -1,7 +1,8 @@
 const Clock = require('../')
 const t = require('tap')
 
-global.performance = global.performance || require('perf_hooks').performance
+global.performance =
+  global.performance || require('perf_hooks').performance
 
 const c = new Clock()
 t.equal(c.now(), 0, 'start at zero')
@@ -96,7 +97,7 @@ t.test('Date', t => {
 
 t.test('enter/exit', t => {
   t.not(performance.now(), c.now())
-  const {setTimeout} = global
+  const { setTimeout } = global
   t.teardown(c.enter())
   t.type(new Date(), c.Date)
   t.not(setTimeout, global.setTimeout)
@@ -111,7 +112,7 @@ t.test('enter/exit', t => {
   c.enter()
 
   let intervalCalled = 0
-  const interval = setInterval(() => intervalCalled ++, 10)
+  const interval = setInterval(() => intervalCalled++, 10)
   c.advance(10)
   c.advance(10)
   t.equal(intervalCalled, 2)
@@ -123,9 +124,9 @@ t.test('enter/exit', t => {
 
   // grabbing a ref before exit still puts it back how it was
   const D = global.Date
-  const {now: perfNow} = performance
-  const {hrtime} = process
-  const {bigint: hrtimeBigint} = hrtime
+  const { now: perfNow } = performance
+  const { hrtime } = process
+  const { bigint: hrtimeBigint } = hrtime
   const {
     setTimeout: sT,
     setInterval: sI,
@@ -158,7 +159,7 @@ t.test('enter/exit', t => {
 
 t.test('n always >= 1', t => {
   let timeoutCalled = false
-  c.setTimeout(() => timeoutCalled = true, -100)
+  c.setTimeout(() => (timeoutCalled = true), -100)
   let intervalCalled = 0
   const interval = c.setInterval(() => intervalCalled++, 0)
   t.equal(timeoutCalled, false)
@@ -179,7 +180,7 @@ t.test('n always >= 1', t => {
 
 t.test('n default 1', t => {
   let timeoutCalled = false
-  c.setTimeout(() => timeoutCalled = true)
+  c.setTimeout(() => (timeoutCalled = true))
   let intervalCalled = 0
   const interval = c.setInterval(() => intervalCalled++)
   t.equal(timeoutCalled, false)
@@ -198,8 +199,8 @@ t.test('n default 1', t => {
 t.test('multiple timers on same tick', t => {
   let called1 = false
   let called2 = false
-  c.setTimeout(() => called1 = true, 1)
-  c.setTimeout(() => called2 = true, 1)
+  c.setTimeout(() => (called1 = true), 1)
+  c.setTimeout(() => (called2 = true), 1)
   t.equal(called1, false)
   t.equal(called2, false)
   c.advance(1)
@@ -240,4 +241,14 @@ t.test('precision with floats', t => {
   c.travel(s)
   t.same(c.hrtime(before), [0, 0])
   t.end()
+})
+
+t.test('go with the flow', async t => {
+  const s = c._now
+  let resolved = false
+  new Promise(res => c.setTimeout(() => res(), 50)).then(
+    () => (resolved = true)
+  )
+  await c.flow(100)
+  t.equal(resolved, true)
 })

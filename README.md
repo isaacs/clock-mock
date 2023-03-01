@@ -54,6 +54,12 @@ Patches:
     Advance the clock by `n` ms.  Use floats for smaller increments of
     time.
 
+* `c.flow(n, step = 5) => Promise<void>`
+
+    Advance the clock in steps, awaiting a Promise at each step,
+    so that actual asynchronous events can occur, as well as
+    timers.
+
 * `c.travel(time)`
 
     Set the clock to a specific time.  Will fire timers that you zoom past.

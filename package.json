@@ -24,9 +24,21 @@
     "prepublishOnly": "git push origin --follow-tags"
   },
   "devDependencies": {
+    "prettier": "^2.8.4",
     "tap": "^16.0.0"
   },
   "engines": {
     "node": ">= 12"
+  },
+  "prettier": {
+    "semi": false,
+    "printWidth": 75,
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "jsxSingleQuote": false,
+    "bracketSameLine": true,
+    "arrowParens": "avoid",
+    "endOfLine": "lf"
   }
 }
