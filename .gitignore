@@ -2,6 +2,8 @@
 /*
 /.*
 
+!/src
+!/tsconfig*
 !/bin
 !/lib
 !/doc{s,}

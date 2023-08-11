@@ -1,13 +1,25 @@
 {
   "name": "clock-mock",
-  "version": "1.1.0",
+  "version": "2.0.0-0",
+  "type": "module",
   "files": [
-    "index.js",
-    "index.d.ts"
+    "dist"
   ],
-  "main": "index.js",
   "exports": {
-    ".": "./index.js"
+    "./package.json": {
+      "import": "./package.json",
+      "require": "./package.json"
+    },
+    ".": {
+      "import": {
+        "types": "./dist/mjs/index.d.ts",
+        "default": "./dist/mjs/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
   },
   "description": "a mock clock for tests involving timing",
   "repository": {
@@ -15,24 +27,32 @@
     "url": "git+https://github.com/isaacs/clock-mock.git"
   },
   "author": "Isaac Z. Schlueter <i@izs.me> (https://izs.me)",
-  "license": "ISC",
+  "license": "BlueOak-1.0.0",
   "scripts": {
-    "test": "tap",
-    "snap": "tap",
     "preversion": "npm test",
     "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags"
+    "prepublishOnly": "git push origin --follow-tags",
+    "prepare": "tsc -p tsconfig/cjs.json && tsc -p tsconfig/esm.json && bash ./scripts/fixup.sh",
+    "pretest": "npm run prepare",
+    "presnap": "npm run prepare",
+    "test": "tap",
+    "snap": "tap",
+    "format": "prettier --write . --loglevel warn --ignore-path ../../.prettierignore --cache",
+    "typedoc": "typedoc --tsconfig tsconfig/esm.json ./src/*.ts"
   },
   "devDependencies": {
-    "prettier": "^2.8.4",
-    "tap": "^16.0.0"
+    "prettier": "^2.8.2",
+    "sync-content": "^1.0.2",
+    "tap": "^18.0.0-12",
+    "typedoc": "^0.24.8",
+    "typescript": "^5.1.6"
   },
   "engines": {
-    "node": ">= 12"
+    "node": ">=16.17"
   },
   "prettier": {
     "semi": false,
-    "printWidth": 75,
+    "printWidth": 70,
     "tabWidth": 2,
     "useTabs": false,
     "singleQuote": true,
