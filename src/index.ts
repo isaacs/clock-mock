@@ -412,7 +412,7 @@ export class Clock implements TimerProvider {
   }
 
   /**
-   * Clear an setImmediate timer created by the clock. (alias for
+   * Clear an immediate timer created by the clock. (alias for
    * {@link Clock#clearTimeout})
    */
   clearImmediate(t: Timer | NodeJS.Immediate) {
