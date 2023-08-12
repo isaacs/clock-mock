@@ -145,7 +145,7 @@ export interface TimerProvider {
  * The mock clock implementation
  */
 export class Clock implements TimerProvider {
-  #now: number = 0
+  #now: number = 1
   #timers: Map<number, Timer[]> = new Map()
   get timers() {
     return this.#timers
@@ -180,7 +180,6 @@ export class Clock implements TimerProvider {
   setImmediate: SetImmediate
 
   constructor() {
-    this.#now = 0
     this.Date = MockDate(this)
     const setTimeoutPromise: SetTimeoutPromise = (
       n?: number,

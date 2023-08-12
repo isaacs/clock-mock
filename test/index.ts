@@ -10,7 +10,7 @@ const {
 } = global
 
 const c = new Clock()
-t.equal(c.now(), 0, 'start at zero')
+t.equal(c.now(), 1, 'start at 1')
 
 t.test('can clear global timers', t => {
   const int = setInterval(() => {
