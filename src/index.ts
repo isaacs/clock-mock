@@ -390,11 +390,11 @@ export class Clock implements TimerProvider {
   /**
    * Clear a timeout created by the clock.
    */
-  clearTimeout(t: Timer | NodeJS.Timer) {
+  clearTimeout(t: Timer | NodeJS.Timeout) {
     if (t) {
       if (typeof (t as Timer).clear === 'function')
         (t as Timer).clear()
-      else globalClearTimeout(t as NodeJS.Timer)
+      else globalClearTimeout(t as NodeJS.Timeout)
     }
   }
 
@@ -402,11 +402,11 @@ export class Clock implements TimerProvider {
    * Clear an interval created by the clock. (alias for
    * {@link Clock#clearTimeout})
    */
-  clearInterval(t: Timer | NodeJS.Timer) {
+  clearInterval(t: Timer | NodeJS.Timeout) {
     if (t) {
       if (typeof (t as Timer).clear === 'function')
         (t as Timer).clear()
-      else globalClearInterval(t as NodeJS.Timer)
+      else globalClearInterval(t as NodeJS.Timeout)
     }
   }
 
