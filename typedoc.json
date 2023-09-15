@@ -1,0 +1,8 @@
+{
+  "tsconfig": "./tsconfig/esm.json",
+  "entryPoints": ["./src/**/*.+(ts|tsx|mts|cts)"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/isaacs/clock-mock",
+    "isaacs projects": "https://isaacs.github.io/"
+  }
+}
