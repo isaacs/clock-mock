@@ -40,7 +40,7 @@ export interface SetTimeoutPromise {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<void>
   <T = void>(
     n: number,
@@ -48,7 +48,7 @@ export interface SetTimeoutPromise {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<T>
 }
 
@@ -76,7 +76,7 @@ export interface SetIntervalPromise {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): AsyncGenerator<void>
   <T = void>(
     n?: number,
@@ -84,7 +84,7 @@ export interface SetIntervalPromise {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): AsyncGenerator<T>
 }
 
@@ -111,14 +111,14 @@ export interface SetImmediatePromise {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<void>
   <T = void>(
     value: T,
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<T>
 }
 
@@ -187,9 +187,8 @@ export class Clock implements TimerProvider {
       options: {
         signal?: AbortSignal
         reffed?: boolean
-      } = {}
-    ): Promise<typeof value> =>
-      this.setTimeoutPromise(n, value, options)
+      } = {},
+    ): Promise<typeof value> => this.setTimeoutPromise(n, value, options)
     this.setTimeout = Object.assign(this.#setTimeout, {
       __promisify__: setTimeoutPromise,
       [promisifySymbol]: setTimeoutPromise,
@@ -201,7 +200,7 @@ export class Clock implements TimerProvider {
       options: {
         signal?: AbortSignal
         reffed?: boolean
-      } = {}
+      } = {},
     ): AsyncGenerator<typeof value> =>
       this.setIntervalPromise(n, value, options)
     this.setInterval = Object.assign(this.#setInterval, {
@@ -214,9 +213,8 @@ export class Clock implements TimerProvider {
       options: {
         signal?: AbortSignal
         reffed?: boolean
-      } = {}
-    ): Promise<typeof value> =>
-      this.setImmediatePromise(value, options)
+      } = {},
+    ): Promise<typeof value> => this.setImmediatePromise(value, options)
     this.setImmediate = Object.assign(this.#setImmediate, {
       __promisify__: setImmediatePromise,
       [promisifySymbol]: setImmediatePromise,
@@ -276,21 +274,21 @@ export class Clock implements TimerProvider {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<void>
   async setImmediatePromise<T = void>(
     value: T,
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<T>
   async setImmediatePromise(
     value?: any,
     options: {
       signal?: AbortSignal
       reffed?: boolean
-    } = {}
+    } = {},
   ): Promise<typeof value> {
     const { signal, reffed = true } = options
     if (signal?.aborted) {
@@ -311,7 +309,7 @@ export class Clock implements TimerProvider {
       this.clearTimeout(timer)
       rej(
         /* c8 ignore start */
-        signal.reason || new Error('The operation was aborted')
+        signal.reason || new Error('The operation was aborted'),
         /* c8 ignore stop */
       )
     }
@@ -339,7 +337,7 @@ export class Clock implements TimerProvider {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<void>
   async setTimeoutPromise<T = void>(
     n: number,
@@ -347,7 +345,7 @@ export class Clock implements TimerProvider {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): Promise<T>
   async setTimeoutPromise(
     n?: number,
@@ -355,7 +353,7 @@ export class Clock implements TimerProvider {
     options: {
       signal?: AbortSignal
       reffed?: boolean
-    } = {}
+    } = {},
   ): Promise<typeof value> {
     const { signal, reffed = true } = options
     if (signal?.aborted) {
@@ -392,8 +390,7 @@ export class Clock implements TimerProvider {
    */
   clearTimeout(t: Timer | NodeJS.Timeout) {
     if (t) {
-      if (typeof (t as Timer).clear === 'function')
-        (t as Timer).clear()
+      if (typeof (t as Timer).clear === 'function') (t as Timer).clear()
       else globalClearTimeout(t as NodeJS.Timeout)
     }
   }
@@ -404,8 +401,7 @@ export class Clock implements TimerProvider {
    */
   clearInterval(t: Timer | NodeJS.Timeout) {
     if (t) {
-      if (typeof (t as Timer).clear === 'function')
-        (t as Timer).clear()
+      if (typeof (t as Timer).clear === 'function') (t as Timer).clear()
       else globalClearInterval(t as NodeJS.Timeout)
     }
   }
@@ -416,8 +412,7 @@ export class Clock implements TimerProvider {
    */
   clearImmediate(t: Timer | NodeJS.Immediate) {
     if (t) {
-      if (typeof (t as Timer).clear === 'function')
-        (t as Timer).clear()
+      if (typeof (t as Timer).clear === 'function') (t as Timer).clear()
       else globalClearImmediate(t as NodeJS.Immediate)
     }
   }
@@ -447,7 +442,7 @@ export class Clock implements TimerProvider {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): AsyncGenerator<void>
   setIntervalPromise<T = void>(
     n?: number,
@@ -455,7 +450,7 @@ export class Clock implements TimerProvider {
     options?: {
       signal?: AbortSignal
       reffed?: boolean
-    }
+    },
   ): AsyncGenerator<T>
   async *setIntervalPromise(
     n: number = 1,
@@ -463,7 +458,7 @@ export class Clock implements TimerProvider {
     options: {
       signal?: AbortSignal
       reffed?: boolean
-    } = {}
+    } = {},
   ): AsyncGenerator<typeof value> {
     // the signal will just cause the timeout promise to reject,
     // so there's really not much to do here.
@@ -538,15 +533,13 @@ export class Clock implements TimerProvider {
 
     global.process.hrtime = Object.assign(
       (a?: [number, number]) =>
-        this.#saved === saved
-          ? this.hrtime(a)
-          : saved.process.hrtime(a),
+        this.#saved === saved ? this.hrtime(a) : saved.process.hrtime(a),
       {
         bigint: () =>
-          this.#saved === saved
-            ? this.hrtimeBigint()
-            : saved.process.hrtime.bigint(),
-      }
+          this.#saved === saved ?
+            this.hrtimeBigint()
+          : saved.process.hrtime.bigint(),
+      },
     )
 
     const self = this
@@ -554,21 +547,18 @@ export class Clock implements TimerProvider {
     global.Date = Object.assign(
       function Date(...args: any) {
         const D = self.#saved === saved ? self.Date : saved.Date
-        return !new.target
-          ? String(new D())
-          : Reflect.construct(D, args)
+        return !new.target ? String(new D()) : Reflect.construct(D, args)
       },
       {
         ...dateProps,
-        now: () =>
-          self.#saved === saved ? self.now() : saved.Date.now(),
-      }
+        now: () => (self.#saved === saved ? self.now() : saved.Date.now()),
+      },
     ) as typeof global.Date
 
     type KPromisify = '__promisify__' | typeof promisifySymbol
     const proxyPromisify = <F extends (...a: any[]) => any>(
       fn: F,
-      method: 'setTimeout' | 'setInterval' | 'setImmediate'
+      method: 'setTimeout' | 'setInterval' | 'setImmediate',
     ) => {
       const who = () => (this.#saved === saved ? this : saved)
       const m = (p: KPromisify) => who()[method][p]
@@ -585,7 +575,7 @@ export class Clock implements TimerProvider {
 
     function setTimeoutProxy(
       fn: (a: void) => any,
-      n?: number
+      n?: number,
     ): Timer | NodeJS.Timer
     function setTimeoutProxy<TArgs extends any[]>(
       fn: (...a: TArgs) => any,
@@ -597,19 +587,19 @@ export class Clock implements TimerProvider {
       n?: number,
       ...a: any[]
     ) {
-      return self.#saved === saved
-        ? self.setTimeout(fn, n, ...a)
+      return self.#saved === saved ?
+          self.setTimeout(fn, n, ...a)
         : saved.setTimeout(fn, n, ...a)
     }
 
     global.setTimeout = proxyPromisify(
       setTimeoutProxy,
-      'setTimeout'
+      'setTimeout',
     ) as unknown as typeof global.setTimeout
 
     function setIntervalProxy(
       f: (a: void) => any,
-      n?: number
+      n?: number,
     ): NodeJS.Timer | Timer
     function setIntervalProxy<TArgs extends []>(
       f: (...a: TArgs) => any,
@@ -621,51 +611,44 @@ export class Clock implements TimerProvider {
       n = 1,
       ...a: any[]
     ): NodeJS.Timer | Timer {
-      return self.#saved === saved
-        ? self.setInterval<any[]>(f, n, ...a)
+      return self.#saved === saved ?
+          self.setInterval<any[]>(f, n, ...a)
         : saved.setInterval(f, n, ...a)
     }
 
     global.setInterval = proxyPromisify(
       setIntervalProxy,
-      'setInterval'
+      'setInterval',
     ) as unknown as typeof global.setInterval
 
-    function setImmediateProxy(
-      fn: (a: void) => any
-    ): Timer | NodeJS.Timer
+    function setImmediateProxy(fn: (a: void) => any): Timer | NodeJS.Timer
     function setImmediateProxy<TArgs extends any[]>(
       fn: (...a: TArgs) => any,
       ...a: TArgs
     ): Timer | NodeJS.Timer
-    function setImmediateProxy(
-      fn: (...a: any[]) => any,
-      ...a: any[]
-    ) {
-      return self.#saved === saved
-        ? self.setImmediate(fn, ...a)
+    function setImmediateProxy(fn: (...a: any[]) => any, ...a: any[]) {
+      return self.#saved === saved ?
+          self.setImmediate(fn, ...a)
         : saved.setImmediate(fn, ...a)
     }
 
     global.setImmediate = proxyPromisify(
       setImmediateProxy,
-      'setImmediate'
+      'setImmediate',
     ) as unknown as typeof global.setImmediate
 
     global.clearTimeout = (t: any) =>
-      this.#saved === saved
-        ? this.clearTimeout(t)
-        : saved.clearTimeout(t)
+      this.#saved === saved ? this.clearTimeout(t) : saved.clearTimeout(t)
 
     global.clearInterval = (t: any) =>
-      this.#saved === saved
-        ? this.clearInterval(t)
-        : saved.clearInterval(t)
+      this.#saved === saved ?
+        this.clearInterval(t)
+      : saved.clearInterval(t)
 
     global.clearImmediate = (t: any) =>
-      this.#saved === saved
-        ? this.clearImmediate(t)
-        : saved.clearImmediate(t)
+      this.#saved === saved ?
+        this.clearImmediate(t)
+      : saved.clearImmediate(t)
 
     return () => this.exit()
   }
@@ -779,7 +762,7 @@ export class Timer {
     if (list && list.length) {
       this.clock.timers.set(
         this.w,
-        list.filter(t => t !== this)
+        list.filter(t => t !== this),
       )
     }
   }

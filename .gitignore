@@ -2,6 +2,7 @@
 /*
 /.*
 
+!/typedoc.json
 !/src
 !/tsconfig*
 !/bin
@@ -26,3 +27,5 @@
 !/map.js
 !/index.js
 !/index.d.ts
+!/.prettier*
+!/.taprc

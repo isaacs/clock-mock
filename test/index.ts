@@ -1,6 +1,6 @@
 import { promisify } from 'node:util'
 import t from 'tap'
-import { Clock, Timer } from '../dist/mjs/index.js'
+import { Clock, Timer } from 'clock-mock'
 const promisifySymbol = Symbol.for('nodejs.util.promisify.custom')
 
 const {
@@ -206,6 +206,7 @@ t.test('enter/exit', async t => {
 
   let pints = 3
   const pint = (async () => {
+    //@ts-ignore
     for await (const p of promisify(setInterval)(10, pints)) {
       t.equal(p, 3)
       if (--pints === 0) break
@@ -359,7 +360,7 @@ t.test('precision with floats', t => {
   t.equal(
     Math.max(10, Math.abs(comp[1] - 123456780)),
     10,
-    'got within float accuracy'
+    'got within float accuracy',
   )
 
   c.travel(s)
@@ -373,7 +374,7 @@ t.test('precision with floats', t => {
 t.test('go with the flow', async t => {
   let resolved = false
   new Promise<void>(res => c.setTimeout(() => res(), 50)).then(
-    () => (resolved = true)
+    () => (resolved = true),
   )
   await c.flow(100)
   t.equal(resolved, true)
@@ -392,7 +393,7 @@ t.test('setTimeout promise with cancel', async t => {
   await p
   const p2 = t.rejects(
     c.setTimeoutPromise(5, undefined, { signal, reffed: false }),
-    poop
+    poop,
   )
   c.advance(10)
   await p2
@@ -409,10 +410,7 @@ t.test('setImmediate promise with cancel', async t => {
   ac.abort(poop)
   c.advance(0)
   await p
-  const p2 = t.rejects(
-    c.setImmediatePromise(undefined, { signal }),
-    poop
-  )
+  const p2 = t.rejects(c.setImmediatePromise(undefined, { signal }), poop)
   c.advance(0)
   await p2
 })
