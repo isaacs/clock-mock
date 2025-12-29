@@ -481,3 +481,37 @@ t.test('setInterval with args', t => {
   t.strictSame(a, [1, 2, 3])
   t.end()
 })
+
+t.test('clamp large timeout values', t => {
+  const warnings = t.capture(process, 'emitWarning').args
+  let firedTimeout = false
+  let firedInterval = false
+  const c = new Clock()
+  c.setTimeout(() => {
+    firedTimeout = true
+  }, 2 ** 32)
+  c.setInterval(
+    () => {
+      firedInterval = true
+    },
+    2 ** 32 + 1,
+  )
+  t.equal(firedTimeout, false)
+  t.equal(firedInterval, false)
+  c.advance(1)
+  t.equal(firedTimeout, true)
+  t.equal(firedInterval, true)
+  t.strictSame(warnings(), [
+    [
+      '4294967296 does not fit into a 32-bit signed integer.\n' +
+        'Timeout duration set to 1',
+      'TimeoutOverflowWarning',
+    ],
+    [
+      '4294967297 does not fit into a 32-bit signed integer.\n' +
+        'Timeout duration set to 1',
+      'TimeoutOverflowWarning',
+    ],
+  ])
+  t.end()
+})

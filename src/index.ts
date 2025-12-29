@@ -2,6 +2,19 @@ const globalClearTimeout = clearTimeout
 const globalClearInterval = clearInterval
 const globalClearImmediate = clearImmediate
 const promisifySymbol = Symbol.for('nodejs.util.promisify.custom')
+const MAX_TIMEOUT = 2 ** 31 - 1
+
+function maxTimeout(n: number): number {
+  if (typeof n === 'number' && n > MAX_TIMEOUT) {
+    process.emitWarning(
+      `${n} does not fit into a 32-bit signed integer.
+Timeout duration set to 1`,
+      'TimeoutOverflowWarning',
+    )
+    n = 1
+  }
+  return n
+}
 
 /**
  * When entering a clock, the current state of the global is saved If another
@@ -321,7 +334,7 @@ export class Clock implements TimerProvider {
   }
 
   #setTimeout(f: (...a: any[]) => any, n = 1, ...a: any[]): Timer {
-    n = Math.max(n, 1)
+    n = maxTimeout(Math.max(n, 1))
     const fn = a.length ? () => f(...a) : f
     const w = n + this.now()
     return new Timer(this, w, fn)
@@ -418,7 +431,7 @@ export class Clock implements TimerProvider {
   }
 
   #setInterval(f: (...a: any[]) => any, n = 1, ...a: any[]) {
-    n = Math.max(n, 1)
+    n = maxTimeout(Math.max(n, 1))
     const fn = a.length ? () => f(...a) : f
     const t = this.setTimeout(() => {
       while (t.w <= this.#now) {
@@ -576,12 +589,12 @@ export class Clock implements TimerProvider {
     function setTimeoutProxy(
       fn: (a: void) => any,
       n?: number,
-    ): Timer | NodeJS.Timer
+    ): Timer | NodeJS.Timeout
     function setTimeoutProxy<TArgs extends any[]>(
       fn: (...a: TArgs) => any,
       n?: number,
       ...a: TArgs
-    ): Timer | NodeJS.Timer
+    ): Timer | NodeJS.Timeout
     function setTimeoutProxy(
       fn: (...a: any[]) => any,
       n?: number,
@@ -600,17 +613,18 @@ export class Clock implements TimerProvider {
     function setIntervalProxy(
       f: (a: void) => any,
       n?: number,
-    ): NodeJS.Timer | Timer
+    ): NodeJS.Timeout | Timer
     function setIntervalProxy<TArgs extends []>(
       f: (...a: TArgs) => any,
       n?: number,
       ...a: TArgs
-    ): NodeJS.Timer | Timer
+    ): NodeJS.Timeout | Timer
     function setIntervalProxy(
       f: (...a: any[]) => any,
       n = 1,
       ...a: any[]
-    ): NodeJS.Timer | Timer {
+    ): NodeJS.Timeout | Timer {
+      n = maxTimeout(n)
       return self.#saved === saved ?
           self.setInterval<any[]>(f, n, ...a)
         : saved.setInterval(f, n, ...a)
@@ -621,11 +635,13 @@ export class Clock implements TimerProvider {
       'setInterval',
     ) as unknown as typeof global.setInterval
 
-    function setImmediateProxy(fn: (a: void) => any): Timer | NodeJS.Timer
+    function setImmediateProxy(
+      fn: (a: void) => any,
+    ): Timer | NodeJS.Timeout
     function setImmediateProxy<TArgs extends any[]>(
       fn: (...a: TArgs) => any,
       ...a: TArgs
-    ): Timer | NodeJS.Timer
+    ): Timer | NodeJS.Timeout
     function setImmediateProxy(fn: (...a: any[]) => any, ...a: any[]) {
       return self.#saved === saved ?
           self.setImmediate(fn, ...a)
